@@ -11,9 +11,9 @@ function capture(fn) {
   return {promise, reported};
 }
 
-function load(loader) {
+function load(loader, props) {
   let {promise, reported} = capture(() => {
-    return loader();
+    return loader(props);
   });
 
   if (reported.length > 1) {
@@ -57,7 +57,7 @@ function load(loader) {
   return state;
 }
 
-function loadMap(obj) {
+function loadMap(obj, props) {
   let state = {
     loading: false,
     loaded: {},
@@ -68,7 +68,7 @@ function loadMap(obj) {
 
   try {
     Object.keys(obj).forEach(key => {
-      let result = load(obj[key]);
+      let result = load(obj[key], props);
 
       if (!result.loading) {
         state.loaded[key] = result.loaded;
@@ -128,7 +128,7 @@ function createLoadableComponent(loadFn, options) {
       super(props);
 
       if (!res) {
-        res = loadFn(opts.loader);
+        res = loadFn(opts.loader, props);
       }
 
       this.state = {
